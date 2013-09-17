@@ -2,7 +2,7 @@
   "name"         : "allthescreens",
   "description"  : "A time-adjusting latency-aware synchronization tool",
   "author"       : "Donald Richardson <me@donaldrichardson.net>",
-  "main"         : "./lib/allthescreens.js" 
+  "main"         : "./lib/allthescreens.js",
   "dependencies" : {
     "node-promise"     : ">= 0.5.8",
     "node-uuid"        : ">= 1.4.0",
