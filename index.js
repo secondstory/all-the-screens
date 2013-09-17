@@ -1,4 +1,4 @@
-var AllTheScreens = require("./lib/allthescreens.js");
+var AllTheScreens = require("./lib/all-the-screens.js");
 
 var port = 8080;
 

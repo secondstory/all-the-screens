@@ -3,8 +3,8 @@ var should = require('should');
 var sinon = require('sinon');
 var Promise = require("node-promise").Promise;
 var all = require("node-promise").all;
-var AllTheScreens = require("../lib/allthescreens.js");
-var UpdateTimeMessage = require("../lib/allthescreens/message/updatetimemessage");
+var AllTheScreens = require("../lib/all-the-screens.js");
+var UpdateTimeMessage = require("../lib/all-the-screens/message/updatetimemessage");
 
 var numberOfClients = 10;
 var server = "localhost";
