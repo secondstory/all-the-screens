@@ -1,0 +1,9 @@
+{ "clientId"                  : null,
+  "socket"                    : null,
+  "rtt"                       : null,
+  "updateTimeRequestById"     : null,
+  "timeoutCount"              : 0,
+  "nonResponsive"             : false,
+  "timedOut"                  : false,
+  "lastResetTime"             : null,
+  "index"                     : null }
