@@ -4,7 +4,6 @@
   "author"       : "Donald Richardson <me@donaldrichardson.net>",
   "main"         : "./lib/all-the-screens.js",
   "version"      : "0.0.0",
-  "private"      : true,
   "dependencies" : {
     "node-promise"     : ">= 0.5.8",
     "node-uuid"        : ">= 1.4.0",
