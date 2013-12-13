@@ -2,6 +2,8 @@ var AllTheScreens = require("all-the-screens");
 
 var server = new AllTheScreens.Server(8090);
 
+server.setFramesPerSecond(30);
+
 server.start();
 
 server.pingAllClientsPeriodically();
