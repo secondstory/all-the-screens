@@ -1,0 +1,206 @@
+<html>
+<head>  
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+  <script src="http://cdn.jsdelivr.net/underscorejs/1.5.2/underscore-min.js"></script>
+  <script src="http://davidbau.com/encode/seedrandom-min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.1/zepto.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/Cookies.js/0.3.1/cookies.min.js"></script>
+  <script src="/js/allthescreens.js"></script>
+  <script src="/js/explosion.js"></script>
+  <script>
+    
+    $('document').ready(function() {
+
+      var r = new Raphael(0, 0, $(window).width(), $(window).height());
+      Explosion.Paper = r;
+
+      var crackleId;
+      if(!Cookies.get("crackleId"))
+      {
+        var x = '';
+        for(var p in navigator)
+        {
+          var value = navigator[p];
+          if(value !== null)
+          {
+            value = String(value);
+            x += value.replace(/[^0-9]/g,'');
+          }
+        }
+  
+        var longNumber = String(Math.random() * new Date().getTime() * x).replace(/[^0-9]/g,'');
+
+        var shuffled = shuffle(longNumber.split("")).slice(0, 10);
+        var crackleId = parseInt(shuffled.join(""));
+        Cookies.set("crackleId", crackleId);
+      }
+      else
+      {
+        crackleId = Cookies.get("crackleId");
+      }
+
+      function createPool()
+      {
+        var circlePoolCount = 50;
+        var circlePool = [];
+
+        for(var i = 0; i < circlePoolCount; i++)
+        {
+          var circle = Explosion.Paper.circle(0, 0, 1);
+          circle.hide();
+          circlePool.push(circle);
+        }
+        return circlePool;
+      }
+
+      var circlePool = createPool();
+
+      var clientId = Math.random();
+      clientId = clientId * Math.pow(10, (clientId.toString().length - 1));
+
+      //Register all the screens client
+      var client = new AllTheScreens.Client(clientId, io, "crackle", 8090);
+      client.connect();
+      client.register();
+
+      var info = io.connect("http://crackle:8091");
+
+      info.on('connect', function() {
+        info.on('forwarded', function(data) {
+          if(data.clientId != clientId && data.crackleId == crackleId)
+          {
+            var explosion = new Explosion({startX: data.startX - window.screenX, startY: data.startY - window.screenY, startFrame: data.startFrame, seed: data.seed, circlePool: circlePool});
+            explosion.startIntervalAnimation(client.getFrame);
+          }
+        });
+      });
+
+      var mouseIsDown = false;
+      var mouseX = 0;
+      var mouseY = 0;
+      var interval;
+      var prevent = false;
+      var preventTimeout = null;
+      $(window).mousedown(function(ev) {
+        mouseIsDown = true;
+        mouseX = ev.x;
+        mouseY = ev.y;
+        if(prevent)
+        {
+          return;
+        }
+        var startFrame = client.getFrame();
+        var seed = new Date().getTime() * startFrame;
+        var explosion = new Explosion({startX: mouseX, startY: mouseY, startFrame: startFrame, seed: seed, circlePool: circlePool});
+        explosion.startIntervalAnimation(client.getFrame);
+        info.emit("forward", {clientId: clientId, startX: mouseX + window.screenX, startY: mouseY + window.screenY, startFrame: startFrame, seed: seed, crackleId: crackleId});
+        
+        clearInterval(interval);
+        interval = setInterval(function() {
+          if(mouseIsDown)
+          {
+            var startFrame = client.getFrame();
+            var seed = new Date().getTime() * startFrame;
+            var explosion = new Explosion({startX: mouseX, startY: mouseY, startFrame: client.getFrame(), seed: seed, circlePool: circlePool});
+            explosion.startIntervalAnimation(client.getFrame);
+            info.emit("forward", {clientId: clientId, startX: mouseX + window.screenX, startY: mouseY + window.screenY, startFrame: startFrame, seed: seed, crackleId: crackleId});
+          }
+        }, 250);
+        prevent = true;
+      });
+
+      $(window).mousemove(function(ev) {
+        mouseX = ev.x;
+        mouseY = ev.y;
+      });
+
+      $(window).mouseup(function(ev) {
+        mouseIsDown = false;
+        clearInterval(interval)
+        if(preventTimeout == null)
+        {
+          preventTimeout = setTimeout(function() {
+            prevent = false; 
+            preventTimeout = null;
+          }, 250);
+        }
+      });
+
+      $(window).resize(function(ev) {
+        Explosion.Paper.remove();
+        var r = new Raphael(0, 0, $(window).width(), $(window).height());
+        Explosion.Paper = r;
+        circlePool = createPool();
+      });
+
+      function hslToRgb(h, s, l){
+        var r, g, b;
+
+        if(s == 0){
+            r = g = b = l; // achromatic
+        }else{
+            function hue2rgb(p, q, t){
+                if(t < 0) t += 1;
+                if(t > 1) t -= 1;
+                if(t < 1/6) return p + (q - p) * 6 * t;
+                if(t < 1/2) return q;
+                if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            }
+
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+
+        return [r * 255, g * 255, b * 255];
+      }
+
+      function shuffle(array) {
+        var currentIndex = array.length
+          , temporaryValue
+          , randomIndex
+          ;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex -= 1;
+
+          // And swap it with the current element.
+          temporaryValue = array[currentIndex];
+          array[currentIndex] = array[randomIndex];
+          array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+      }
+
+      setInterval(function() {
+        var periodInFrames = 600;
+         
+        var h = (client.getFrame() % periodInFrames) / periodInFrames;
+        var l = (Math.sin((client.getFrame() / periodInFrames) * (Math.PI / 2)) / 16) + 0.9;
+        var s = 0.5;
+
+        var rgb = hslToRgb(h,s,l);
+
+        var r = Math.floor(rgb[0]);
+        var g = Math.floor(rgb[1]);
+        var b = Math.floor(rgb[2]);
+        
+        $('body').css('background-color', 'rgb(' + r + ',' + g + ',' + b + ')');
+      }, 10);
+
+    });
+
+  </script>
+</head>
+<body>
+</body>
+</html>

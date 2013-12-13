@@ -1,0 +1,8 @@
+{ 
+  "name" : "crackle",
+  "main" : "./crackle.js",
+  "dependencies" : {
+    "socket.io": ">=0.9.16",
+    "all-the-screens": "secondstory/all-the-screens"
+  }
+}
