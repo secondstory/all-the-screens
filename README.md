@@ -96,7 +96,7 @@ server.sendAllHeartbeatsPeriodically();
 ```
 
 ```html
-//Run the appropriate All The Screens client
+<!-- Run the appropriate All The Screens client -->
 <html>
   <script src="/js/allthescreens.js"></script>
   <script src="/js/socket.io.min.js"></script>
