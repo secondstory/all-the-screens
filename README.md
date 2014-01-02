@@ -22,25 +22,25 @@ animation to last a specific, precise amount of time.
 
 1. Client registers
 
-The client connects to the server using socket.io and registers its clientId.
+   The client connects to the server using socket.io and registers its clientId.
 
 2. Server polls for client's RTT
 
-The server then proceeds to ping it periodically and maintains the client's
+   The server then proceeds to ping it periodically and maintains the client's
 Round Trip Time (RTT). An assumption is made that each leg of the trip, to and
 from the client takes up half of the RTT, which we'll call the client's
 latency. 
 
-3. The client clock's are reset
+3. The client clocks are reset
 
-The server sends messages to all the clients indicating that their times should
+   The server sends messages to all the clients indicating that their times should
 be the server's time plus the client's latency. The clients set their times
 accordingly and update their clocks as time passes independently. The clients
 also receives a target framerate which they store.
 
 4. The clients' times are updated using a version of the Berkley algorithm
 
-The server periodically asks all the clients for their times. When all clients
+   The server periodically asks all the clients for their times. When all clients
 have responded--clients that don't respond within a certain amount of time are
 ignored--each client's latency is added to their respective time.  Those times,
 and the server's own time, are added together and averaged. Then, the server
@@ -49,7 +49,9 @@ their time appropriately.  In order to preserve the monotonicity of time, any
 negative adjustments are handled by the client by halting their clocks for that
 duration of time.
 
-5. Clients receive a periodic heartbeat that indicates what frame they should
+5. Clients receive a periodic heartbeat
+
+   The heartbeat indicates what frame they should
 be at at a specific time. Then, given their synchronized clocks, and the target
 framerate they are able to determine which frame they should be at.
 
