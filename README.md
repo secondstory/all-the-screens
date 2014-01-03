@@ -22,25 +22,25 @@ animation to last a specific, precise amount of time.
 
 1. Client registers
 
-The client connects to the server using socket.io and registers its clientId.
+   The client connects to the server using socket.io and registers its clientId.
 
 2. Server polls for client's RTT
 
-The server then proceeds to ping it periodically and maintains the client's
+   The server then proceeds to ping it periodically and maintains the client's
 Round Trip Time (RTT). An assumption is made that each leg of the trip, to and
 from the client takes up half of the RTT, which we'll call the client's
 latency. 
 
-3. The client clock's are reset
+3. The client clocks are reset
 
-The server sends messages to all the clients indicating that their times should
+   The server sends messages to all the clients indicating that their times should
 be the server's time plus the client's latency. The clients set their times
 accordingly and update their clocks as time passes independently. The clients
 also receives a target framerate which they store.
 
 4. The clients' times are updated using a version of the Berkley algorithm
 
-The server periodically asks all the clients for their times. When all clients
+   The server periodically asks all the clients for their times. When all clients
 have responded--clients that don't respond within a certain amount of time are
 ignored--each client's latency is added to their respective time.  Those times,
 and the server's own time, are added together and averaged. Then, the server
@@ -49,9 +49,31 @@ their time appropriately.  In order to preserve the monotonicity of time, any
 negative adjustments are handled by the client by halting their clocks for that
 duration of time.
 
-5. Clients receive a periodic heartbeat that indicates what frame they should
+5. Clients receive a periodic heartbeat
+
+   The heartbeat indicates what frame they should
 be at at a specific time. Then, given their synchronized clocks, and the target
 framerate they are able to determine which frame they should be at.
+
+## How accurate is it?
+
+The simple and perhaps frustrating answer to this question is that it really depends. It depends on what you mean by accuracy. Here are some things you might mean and my responses to them:
+
+Q. Are my video/animation frames going to show up at the same time across clients?
+
+A. You are _not_ going to get performance anywhere near the neighborhood accuracy neighborhood provided by solutions such as hardware-based synchornized buffer swapping.  However, you will most definitely get performance that is better than a simple draw-this-frame-now broadcast approach. The syncing accuracy will depend on the variability of the network latency, how symmetrical the latency is (an assumption is made that the time for information to get to the client from the server is the same or very similar to how long it takes for data to get from the client back to the server), and how good each client is at keeping track of where it should be.
+
+Q. Will my video/animation always take up a precise amount of absolute time?
+
+A. The answer to this question is most definitely not. The algorithm that is being used synchronizes clients by averaging all their times. Thus, if a particular client is moving faster than the rest, it will be asked to slow down slightly, and the others will all be asked to speed up a bit. 
+
+Q. Will there ever be a situation where disparate frames may be displayed?
+
+A. There very well may be. Clients aren't in any way forced to render a specific frame at a specific time.  They receive heartbeat that indicates that a frame should render at a specific time. It is your code that is responsible for drawing what needs to be drawn. 
+
+Q. Where are the numbers? Do you have data? Performance tests?
+
+A. No. There are no performance tests. This would be a good thing to have. The best performance tests would probably involve tracking the various factors that affect synchrnonization drift and to test the percentage of time that disparate frames are displayed using different synchronization techniques.
 
 ## Show me some code
 
@@ -74,7 +96,7 @@ server.sendAllHeartbeatsPeriodically();
 ```
 
 ```html
-//Run the appropriate All The Screens client
+<!-- Run the appropriate All The Screens client -->
 <html>
   <script src="/js/allthescreens.js"></script>
   <script src="/js/socket.io.min.js"></script>
