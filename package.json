@@ -3,7 +3,7 @@
   "description"  : "A time-adjusting latency-aware synchronization tool",
   "author"       : "Donald Richardson <me@donaldrichardson.net>",
   "main"         : "./lib/all-the-screens.js",
-  "version"      : "0.0.0",
+  "version"      : "0.0.1",
   "dependencies" : {
     "node-promise"     : ">= 0.5.8",
     "node-uuid"        : ">= 1.4.0",
