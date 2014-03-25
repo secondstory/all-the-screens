@@ -12,6 +12,14 @@
     
     $('document').ready(function() {
 
+      if(document.location.href.indexOf("popup") == -1)
+      {
+        openWindows(); 
+        return;
+      }
+
+      $('#helpDiv').hide();
+
       var r = new Raphael(0, 0, $(window).width(), $(window).height());
       Explosion.Paper = r;
 
@@ -60,18 +68,18 @@
       clientId = clientId * Math.pow(10, (clientId.toString().length - 1));
 
       //Register all the screens client
-      var client = new AllTheScreens.Client(clientId, io, "crackle", 8090);
+      var client = new AllTheScreens.Client(clientId, io, window.location.hostname, 8090);
       client.connect();
       client.register();
 
-      var info = io.connect("http://crackle:8091");
+      var info = io.connect("http://" + window.location.hostname + ":8091");
 
       info.on('connect', function() {
         info.on('forwarded', function(data) {
           if(data.clientId != clientId && data.crackleId == crackleId)
           {
             var explosion = new Explosion({startX: data.startX - window.screenX, startY: data.startY - window.screenY, startFrame: data.startFrame, seed: data.seed, circlePool: circlePool});
-            explosion.startIntervalAnimation(client.getFrame);
+            explosion.doAnimation(client.getFrame);
           }
         });
       });
@@ -93,7 +101,8 @@
         var startFrame = client.getFrame();
         var seed = new Date().getTime() * startFrame;
         var explosion = new Explosion({startX: mouseX, startY: mouseY, startFrame: startFrame, seed: seed, circlePool: circlePool});
-        explosion.startIntervalAnimation(client.getFrame);
+        explosion.doAnimation(client.getFrame);
+
         info.emit("forward", {clientId: clientId, startX: mouseX + window.screenX, startY: mouseY + window.screenY, startFrame: startFrame, seed: seed, crackleId: crackleId});
         
         clearInterval(interval);
@@ -103,7 +112,7 @@
             var startFrame = client.getFrame();
             var seed = new Date().getTime() * startFrame;
             var explosion = new Explosion({startX: mouseX, startY: mouseY, startFrame: client.getFrame(), seed: seed, circlePool: circlePool});
-            explosion.startIntervalAnimation(client.getFrame);
+            explosion.doAnimation(client.getFrame);
             info.emit("forward", {clientId: clientId, startX: mouseX + window.screenX, startY: mouseY + window.screenY, startFrame: startFrame, seed: seed, crackleId: crackleId});
           }
         }, 250);
@@ -181,6 +190,7 @@
         return array;
       }
 
+      var previousFrame = 0;
       setInterval(function() {
         var periodInFrames = 600;
          
@@ -193,14 +203,55 @@
         var r = Math.floor(rgb[0]);
         var g = Math.floor(rgb[1]);
         var b = Math.floor(rgb[2]);
-        
+
         $('body').css('background-color', 'rgb(' + r + ',' + g + ',' + b + ')');
       }, 10);
+
+      function openWindows()
+      {
+        var window4 = window.open("http://sandbox.secondstory.com/crackle?popup=true", "", "width=200,height=200,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,top=500,left=225");
+        var window3 = window.open("http://sandbox.secondstory.com/crackle?popup=true", "", "width=200,height=200,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,top=400,left=100");
+        var window1 = window.open("http://sandbox.secondstory.com/crackle?popup=true", "", "width=200,height=200,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,top=200,left=175");
+        var window2 = window.open("http://sandbox.secondstory.com/crackle?popup=true", "", "width=200,height=200,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,top=300,left=300");
+      }
 
     });
 
   </script>
+  <style>
+    svg
+    {
+      pointer-events: none;
+    }
+    #helpDiv {
+      font-family: sans-serif; 
+      color: #666; 
+      font-size: 1.2em;
+    }
+    .unselectable
+    { 
+      -moz-user-select: none; 
+      -khtml-user-select: none; 
+      -webkit-user-select: none; 
+      -o-user-select: none; 
+    }
+  </style>
 </head>
 <body>
+  <div id="helpDiv">
+    <div id="instructions" class="unselectable">
+      <p class="unselectable">
+        Make sure this window is full screen.  You should see four little popup
+        windows with shifting colors right below this text. If you don't, you
+        may need to allow popups for this site.
+
+      </p>
+
+      <p class="unselectable">
+	Click on the edges of a window and watch the bubbles flow from one
+        window to the others in synchronized fashion! 
+      </p>
+    </div>
+  </div>
 </body>
 </html>
