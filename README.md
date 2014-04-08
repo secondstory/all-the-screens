@@ -128,3 +128,7 @@ Alright! Open up two Chrome browser windows slightly overlapping each other and 
 http://sandbox.secondstory.com/crackle
 
 Now go ahead and click near the edges where the browsers meet. You should see animated bubbles synchronized between the two browser windows.
+
+## Licensing
+
+All The Screens is licensed under the MIT License.  
