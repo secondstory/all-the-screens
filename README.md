@@ -123,11 +123,11 @@ server.sendAllHeartbeatsPeriodically();
 
 ## Show me a demo
 
-Alright! Open up two Chrome browser windows slightly overlapping each other and point them to this address: 
+Alright! Open up a maximized Chrome browser window and point it to this address: 
 
 http://sandbox.secondstory.com/crackle
 
-Now go ahead and click near the edges where the browsers meet. You should see animated bubbles synchronized between the two browser windows.
+Now go ahead and click near the edges where the browsers meet. You should see animated bubbles synchronized between the two browser windows. You may need to make sure that you allow popups.
 
 ## Licensing
 
