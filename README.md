@@ -132,3 +132,4 @@ Now go ahead and click near the edges where the browsers meet. You should see an
 ## Licensing
 
 All The Screens is licensed under the MIT License.  
+=======
