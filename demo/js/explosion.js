@@ -86,6 +86,8 @@ function Explosion(options) {
 
   //calculate individual particle animation duration
 
+  var date = new Date().getTime();
+
   return  {
     animate: function(frame, testStartFrame) {
       var startFrame = options.startFrame;
@@ -123,7 +125,6 @@ function Explosion(options) {
             {
               if($.inArray(circle, options.circlePool) == -1)
               {
-                console.log('here');
                 options.circlePool.push(circle);
                 circle.transform("");
               }
@@ -157,33 +158,32 @@ function Explosion(options) {
 
     intervalAnimation: null, 
     intervalFrame: 0,
+    previousFrame: 0,
 
-    startIntervalAnimation: function(getFrameCallback) {
+    doAnimation: function(getFrameCallback) {
       var that = this;
-      this.intervalAnimation = setInterval(function() {
-        var frame = that.intervalFrame;
-        var startFrame = 0;
-        if(getFrameCallback !== undefined)
-        {
-          frame = getFrameCallback();
-          startFrame = options.startFrame;
-        }
-        var currentFrame = frame - options.startFrame;
-        that.animate(frame, startFrame);
-        if(getFrameCallback === undefined)
-        {
-          that.intervalFrame++;
-        }
-        if(currentFrame >= options.fps * options.duration)
-        {
-          that.stopIntervalAnimation();
-        }
-      }, 1000 / options.fps);
-    },
 
-    stopIntervalAnimation: function() {
-      clearInterval(this.intervalAnimation); 
-      this.destroy();
+      var frame = that.intervalFrame;
+      var startFrame = 0;
+      if(getFrameCallback !== undefined)
+      {
+        frame = getFrameCallback();
+        startFrame = options.startFrame;
+      }
+      var currentFrame = frame - options.startFrame;
+      that.animate(frame, startFrame);
+      if(getFrameCallback === undefined)
+      {
+        that.intervalFrame++;
+      }
+      if(currentFrame >= options.fps * options.duration)
+      {
+        this.destroy();
+      }
+      else
+      {
+        requestAnimationFrame(function(){that.doAnimation(getFrameCallback);});
+      }
     },
 
     destroy: function() {
