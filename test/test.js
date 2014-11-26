@@ -5,6 +5,7 @@ var Promise = require("node-promise").Promise;
 var all = require("node-promise").all;
 var AllTheScreens = require("../lib/all-the-screens.js");
 var UpdateTimeMessage = require("../lib/all-the-screens/message/updatetimemessage");
+var ioClient = require("socket.io-client");
 
 var numberOfClients = 10;
 var server = "localhost";
@@ -24,7 +25,7 @@ describe("AllTheScreens", function() {
     try {
       for(var i = 0; i < numberOfClients; i++)
       {
-        this.clients[i] = new AllTheScreens.Client(i, server, port);
+        this.clients[i] = new AllTheScreens.Client(i, ioClient, server, port);
       }
     }
     catch(err) {
@@ -59,7 +60,6 @@ describe("AllTheScreens", function() {
     };
     for(var i = 0; i < numberOfClients; i++)
     {
-      console.log("Connecting client " + i);
       this.clients[i].connect();
       this.clients[i].register(function(data) {
         data.should.equal("Client successfully registered");
